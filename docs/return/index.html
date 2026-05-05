@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>お支払いが完了しました | 銀座東京フラワー</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Noto+Serif+JP:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf8f5;
+  --bg-paper: #ffffff;
+  --ink: #1a1714;
+  --ink-soft: #4a4540;
+  --ink-faint: #8a857f;
+  --accent: #8b1c2b;
+  --gold: #b89a5e;
+  --line: #e8e3dc;
+  --line-soft: #f0ebe3;
+  --success: #2d6a4f;
+  --serif-display: 'Cormorant Garamond', 'Noto Serif JP', serif;
+  --serif: 'Noto Serif JP', serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--serif);
+  background:
+    radial-gradient(ellipse at top, rgba(184,154,94,0.08) 0%, transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-weight: 300;
+  line-height: 1.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.card {
+  max-width: 540px;
+  width: 100%;
+  background: var(--bg-paper);
+  border: 1px solid var(--line);
+  padding: 64px 48px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(26,23,20,0.04), 0 12px 32px rgba(26,23,20,0.06);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid var(--line-soft);
+  pointer-events: none;
+}
+.brand-mark {
+  font-family: var(--serif-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.brand-name {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  margin-bottom: 48px;
+}
+.icon-frame {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 32px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: pulse 3s ease-in-out infinite;
+}
+.icon-frame::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--line-soft);
+  border-radius: 50%;
+}
+.icon-frame svg {
+  width: 36px;
+  height: 36px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(184,154,94,0.3); }
+  50% { box-shadow: 0 0 0 16px rgba(184,154,94,0); }
+}
+h1 {
+  font-family: var(--serif-display);
+  font-weight: 300;
+  font-size: 2.2rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.subtitle {
+  font-family: var(--serif-display);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  margin-bottom: 32px;
+}
+.subtitle::before, .subtitle::after {
+  content: '—';
+  margin: 0 12px;
+}
+.message {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin-bottom: 32px;
+  line-height: 1.9;
+}
+.divider {
+  width: 48px;
+  height: 1px;
+  background: var(--gold);
+  margin: 32px auto;
+}
+.contact {
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+  line-height: 2;
+}
+.contact strong {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.foot {
+  margin-top: 40px;
+  font-family: var(--serif-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--ink-faint);
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand-mark">Ginza Tokyo Flower</div>
+  <div class="brand-name">銀座東京フラワー</div>
+
+  <div class="icon-frame">
+    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div>
+
+  <h1>お支払いを承りました</h1>
+  <div class="subtitle">Thank you for your payment</div>
+
+  <p class="message">
+    この度は当店をご利用いただき、<br>
+    誠にありがとうございました。<br><br>
+    お支払い手続きが正常に完了いたしました。
+  </p>
+
+  <div class="divider"></div>
+
+  <div class="contact">
+    <strong>銀座東京フラワー</strong><br>
+    お問い合わせは下記まで<br>
+    info@tokyoflower.jp
+  </div>
+
+  <div class="foot">— 2026 —</div>
+</div>
+</body>
+</html>

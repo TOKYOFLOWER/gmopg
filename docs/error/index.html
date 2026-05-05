@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>お支払いに関するお知らせ | 銀座東京フラワー</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Noto+Serif+JP:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf8f5;
+  --bg-paper: #ffffff;
+  --ink: #1a1714;
+  --ink-soft: #4a4540;
+  --ink-faint: #8a857f;
+  --accent: #8b1c2b;
+  --gold: #b89a5e;
+  --line: #e8e3dc;
+  --line-soft: #f0ebe3;
+  --serif-display: 'Cormorant Garamond', 'Noto Serif JP', serif;
+  --serif: 'Noto Serif JP', serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--serif);
+  background:
+    radial-gradient(ellipse at top, rgba(139,28,43,0.05) 0%, transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-weight: 300;
+  line-height: 1.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.card {
+  max-width: 540px;
+  width: 100%;
+  background: var(--bg-paper);
+  border: 1px solid var(--line);
+  padding: 64px 48px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(26,23,20,0.04), 0 12px 32px rgba(26,23,20,0.06);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid var(--line-soft);
+  pointer-events: none;
+}
+.brand-mark {
+  font-family: var(--serif-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.brand-name {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  margin-bottom: 48px;
+}
+.icon-frame {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 32px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.icon-frame::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--line-soft);
+  border-radius: 50%;
+}
+.icon-frame svg {
+  width: 36px;
+  height: 36px;
+  stroke: var(--accent);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+h1 {
+  font-family: var(--serif-display);
+  font-weight: 300;
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.subtitle {
+  font-family: var(--serif-display);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  margin-bottom: 32px;
+}
+.subtitle::before, .subtitle::after {
+  content: '—';
+  margin: 0 12px;
+}
+.message {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  margin-bottom: 32px;
+  line-height: 1.9;
+}
+.divider {
+  width: 48px;
+  height: 1px;
+  background: var(--gold);
+  margin: 32px auto;
+}
+.reasons {
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  background: var(--bg);
+  padding: 20px 24px;
+  margin: 24px 0;
+  border-left: 2px solid var(--gold);
+}
+.reasons li { margin: 6px 0 6px 20px; list-style: '— '; }
+.contact {
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+  line-height: 2;
+}
+.contact strong {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.foot {
+  margin-top: 40px;
+  font-family: var(--serif-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--ink-faint);
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand-mark">Ginza Tokyo Flower</div>
+  <div class="brand-name">銀座東京フラワー</div>
+
+  <div class="icon-frame">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16.5" x2="12" y2="17"></line><circle cx="12" cy="12" r="9"></circle></svg>
+  </div>
+
+  <h1>お支払いを完了できませんでした</h1>
+  <div class="subtitle">Payment not completed</div>
+
+  <p class="message">
+    お支払いの手続きが完了しませんでした。<br>
+    お手数ですが、内容をご確認のうえ<br>
+    再度お試しいただくか、当店までご連絡ください。
+  </p>
+
+  <ul class="reasons">
+    <li>カード情報が正しく入力されていない</li>
+    <li>カードの有効期限切れ・利用限度額超過</li>
+    <li>3Dセキュア認証が完了していない</li>
+    <li>お支払いURLの有効期限が切れている</li>
+  </ul>
+
+  <div class="divider"></div>
+
+  <div class="contact">
+    <strong>銀座東京フラワー</strong><br>
+    お問い合わせは下記まで<br>
+    info@tokyoflower.jp
+  </div>
+
+  <div class="foot">— 2026 —</div>
+</div>
+</body>
+</html>

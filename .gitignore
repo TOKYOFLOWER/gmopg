@@ -1,0 +1,28 @@
+# clasp
+.clasp.json
+.clasprc.json
+gas-src/.clasp.json
+
+# local working copies
+gas-src.bak/
+
+# claude code local settings
+.claude/
+
+# secrets
+.env
+.env.local
+*.local
+
+# node
+node_modules/
+
+# editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# logs
+*.log

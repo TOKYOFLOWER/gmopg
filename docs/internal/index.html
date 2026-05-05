@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>決済URL発行 | 銀座東京フラワー</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Noto+Serif+JP:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf8f5;
+  --bg-paper: #ffffff;
+  --ink: #1a1714;
+  --ink-soft: #4a4540;
+  --ink-faint: #8a857f;
+  --accent: #8b1c2b;
+  --accent-soft: #b85966;
+  --gold: #b89a5e;
+  --line: #e8e3dc;
+  --line-soft: #f0ebe3;
+  --error: #a02530;
+  --success: #2d6a4f;
+  --serif-display: 'Cormorant Garamond', 'Noto Serif JP', serif;
+  --serif: 'Noto Serif JP', serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--serif);
+  background:
+    radial-gradient(ellipse at top right, rgba(184,154,94,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse at bottom left, rgba(139,28,43,0.04) 0%, transparent 50%),
+    var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-weight: 300;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+}
+
+/* ─── Header ─── */
+header.brand {
+  text-align: center;
+  padding-bottom: 32px;
+  margin-bottom: 48px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+header.brand::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.brand-mark {
+  font-family: var(--serif-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  font-weight: 400;
+}
+.brand-name {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  color: var(--ink);
+}
+.brand-sub {
+  font-family: var(--serif-display);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  margin-top: 8px;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Page Title ─── */
+h1.page-title {
+  font-family: var(--serif-display);
+  font-weight: 300;
+  font-size: 2.4rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+.page-subtitle {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  margin-bottom: 48px;
+}
+.page-subtitle::before, .page-subtitle::after {
+  content: '—';
+  margin: 0 12px;
+  color: var(--gold);
+}
+
+/* ─── Card / Paper ─── */
+.paper {
+  background: var(--bg-paper);
+  border: 1px solid var(--line);
+  padding: 40px 36px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(26,23,20,0.04), 0 12px 32px rgba(26,23,20,0.04);
+  position: relative;
+}
+.paper::before {
+  content: '';
+  position: absolute;
+  top: 8px; left: 8px; right: 8px; bottom: 8px;
+  border: 1px solid var(--line-soft);
+  pointer-events: none;
+}
+
+.section-label {
+  font-family: var(--serif-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* ─── Form ─── */
+.field {
+  margin-bottom: 24px;
+}
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 0;
+}
+.field-row .field {
+  margin-bottom: 24px;
+}
+@media (max-width: 540px) {
+  .field-row { grid-template-columns: 1fr; gap: 0; }
+}
+
+label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+label .req {
+  color: var(--accent);
+  margin-left: 4px;
+  font-size: 0.7rem;
+}
+.label-hint {
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  margin-left: 8px;
+  font-weight: 300;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  color: var(--ink);
+  transition: all 0.2s ease;
+  font-weight: 300;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-paper);
+  box-shadow: 0 0 0 3px rgba(139,28,43,0.06);
+}
+input.amount {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  text-align: right;
+}
+.amount-wrap {
+  position: relative;
+}
+.amount-wrap::after {
+  content: '円';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-faint);
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+.amount-wrap input.amount { padding-right: 32px; }
+
+/* ─── Quick Amount Buttons ─── */
+.quick-amounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.quick-amount {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--ink-soft);
+}
+.quick-amount:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+/* ─── Submit Button ─── */
+.actions {
+  text-align: center;
+  margin-top: 32px;
+}
+button.primary {
+  font-family: var(--serif-display);
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  padding: 14px 56px;
+  background: var(--ink);
+  color: var(--bg);
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  position: relative;
+}
+button.primary::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(250,248,245,0.3);
+  pointer-events: none;
+}
+button.primary:hover { background: var(--accent); }
+button.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── Result ─── */
+.result {
+  display: none;
+  background: var(--bg-paper);
+  border: 1px solid var(--gold);
+  padding: 36px;
+  margin-top: 32px;
+  position: relative;
+}
+.result.show { display: block; animation: fadeIn 0.4s ease; }
+.result::before {
+  content: '✓';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  background: var(--bg-paper);
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 1.1rem;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.result h2 {
+  font-family: var(--serif-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 24px;
+  color: var(--success);
+  letter-spacing: 0.05em;
+}
+.url-display {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  word-break: break-all;
+  margin: 16px 0;
+  color: var(--ink-soft);
+}
+.copy-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+.copy-btn {
+  font-family: var(--serif);
+  font-size: 0.85rem;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid var(--ink-soft);
+  color: var(--ink-soft);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: all 0.2s;
+}
+.copy-btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.copy-btn.gold { border-color: var(--gold); color: var(--gold); }
+.copy-btn.gold:hover { background: var(--gold); color: white; }
+
+.mail-preview {
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.mail-preview-label {
+  font-family: var(--serif-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 12px;
+}
+.mail-preview pre {
+  font-family: var(--serif);
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+/* ─── Status ─── */
+.status {
+  padding: 12px 16px;
+  margin: 16px 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+.status.error {
+  background: rgba(160,37,48,0.06);
+  border-left: 2px solid var(--error);
+  color: var(--error);
+}
+.status.info {
+  background: rgba(184,154,94,0.06);
+  border-left: 2px solid var(--gold);
+  color: var(--ink-soft);
+}
+
+/* ─── Auth Modal ─── */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,23,20,0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.auth-overlay.hidden { display: none; }
+.auth-box {
+  background: var(--bg-paper);
+  padding: 48px 40px;
+  max-width: 400px;
+  width: 90%;
+  border: 1px solid var(--gold);
+  text-align: center;
+  position: relative;
+}
+.auth-box::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid var(--line-soft);
+  pointer-events: none;
+}
+.auth-box h2 {
+  font-family: var(--serif-display);
+  font-weight: 300;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+.auth-box p {
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  margin-bottom: 24px;
+}
+
+/* ─── Env Badge ─── */
+.env-badge {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  letter-spacing: 0.1em;
+  z-index: 50;
+}
+.env-badge.test { background: var(--gold); color: white; }
+.env-badge.prod { background: var(--accent); color: white; }
+.env-badge.unknown { background: var(--ink-faint); color: white; }
+
+/* ─── Footer ─── */
+footer.foot {
+  text-align: center;
+  margin-top: 48px;
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+}
+footer.foot::before {
+  content: '❦';
+  display: block;
+  color: var(--gold);
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+</style>
+</head>
+<body>
+
+<!-- 環境バッジ -->
+<div class="env-badge unknown" id="envBadge">— LOADING —</div>
+
+<!-- 認証モーダル -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <h2>Internal Access</h2>
+    <p>共有シークレットを入力してください</p>
+    <input type="password" id="authSecret" placeholder="Shared Secret" autocomplete="off">
+    <div class="actions" style="margin-top:20px;">
+      <button class="primary" onclick="submitAuth()">入室</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Brand Header -->
+  <header class="brand">
+    <div class="brand-mark">Ginza Tokyo Flower</div>
+    <div class="brand-name">銀座東京フラワー</div>
+    <div class="brand-sub">est. — Internal Tools</div>
+  </header>
+
+  <!-- Page Title -->
+  <h1 class="page-title">決済URL 発行</h1>
+  <div class="page-subtitle">Issue Payment Link</div>
+
+  <!-- Form -->
+  <div class="paper">
+    <div class="section-label">Order Details</div>
+
+    <div class="field">
+      <label>スタッフ名 <span class="req">*</span></label>
+      <input type="text" id="staffName" placeholder="発行者の氏名" required>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>お客様名 <span class="label-hint">任意</span></label>
+        <input type="text" id="customerName" placeholder="例: 山田 花子 様">
+      </div>
+      <div class="field">
+        <label>お客様メール <span class="label-hint">任意</span></label>
+        <input type="email" id="customerEmail" placeholder="hanako@example.com">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>金額 <span class="req">*</span></label>
+      <div class="amount-wrap">
+        <input type="number" id="amount" class="amount" min="1" max="9999999" placeholder="0" required>
+      </div>
+      <div class="quick-amounts">
+        <button type="button" class="quick-amount" onclick="setAmount(11000)">11,000</button>
+        <button type="button" class="quick-amount" onclick="setAmount(19000)">19,000</button>
+        <button type="button" class="quick-amount" onclick="setAmount(27000)">27,000</button>
+        <button type="button" class="quick-amount" onclick="setAmount(33000)">33,000</button>
+        <button type="button" class="quick-amount" onclick="setAmount(55000)">55,000</button>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>自由項目1 <span class="label-hint">商品名・内訳など</span></label>
+        <input type="text" id="free1" placeholder="例: スリースタンド">
+      </div>
+      <div class="field">
+        <label>自由項目2 <span class="label-hint">任意</span></label>
+        <input type="text" id="free2" placeholder="">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>社内メモ <span class="label-hint">お客様には表示されません</span></label>
+      <textarea id="memo" rows="2" placeholder=""></textarea>
+    </div>
+
+    <div class="field">
+      <label>有効期限 <span class="label-hint">URL の有効期間</span></label>
+      <select id="expiryHours">
+        <option value="24">1日（24時間）</option>
+        <option value="72">3日</option>
+        <option value="168" selected>7日</option>
+        <option value="336">14日</option>
+        <option value="720">30日</option>
+      </select>
+    </div>
+
+    <div id="statusBox"></div>
+
+    <div class="actions">
+      <button class="primary" id="submitBtn" onclick="issuePayment()">URL を発行する</button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result" id="result">
+    <h2>発行が完了しました</h2>
+
+    <div class="section-label">Payment URL</div>
+    <div class="url-display" id="resultUrl"></div>
+    <div style="text-align:center; font-size:0.8rem; color:var(--ink-faint);">
+      有効期限: <span id="resultExpiry"></span>
+    </div>
+
+    <div class="copy-btns">
+      <button class="copy-btn gold" onclick="copyUrl()">URL をコピー</button>
+      <button class="copy-btn" onclick="copyMail()">メール文面をコピー</button>
+      <button class="copy-btn" onclick="resetForm()">新しく発行</button>
+    </div>
+
+    <div class="mail-preview">
+      <div class="mail-preview-label">— Mail Template Preview —</div>
+      <pre id="mailPreview"></pre>
+    </div>
+  </div>
+
+  <footer class="foot">
+    GMO-PG リンクタイプPlus / 内部限定ツール
+  </footer>
+</div>
+
+<script>
+// ============================================================
+// Configuration — Phase 3 でWebApp URLが確定したら書き換え
+// ============================================================
+const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwKv9W7-yurdfYNrl1DIulMr5I0VFmOXHgUvPCj1woDqBei-MNtzlBRI3zdXVYl-E2i/exec';
+
+// ============================================================
+// Auth (簡易共有シークレット方式)
+// ============================================================
+const STORAGE_KEY = 'gmopg_internal_secret_v1';
+
+function getStoredSecret() {
+  return sessionStorage.getItem(STORAGE_KEY) || '';
+}
+function setStoredSecret(s) {
+  sessionStorage.setItem(STORAGE_KEY, s);
+}
+function showAuth() {
+  document.getElementById('authOverlay').classList.remove('hidden');
+}
+function hideAuth() {
+  document.getElementById('authOverlay').classList.add('hidden');
+}
+function submitAuth() {
+  const v = document.getElementById('authSecret').value.trim();
+  if (!v) return;
+  setStoredSecret(v);
+  hideAuth();
+  checkHealth();
+}
+
+// ============================================================
+// Init
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  if (!getStoredSecret()) {
+    showAuth();
+  } else {
+    checkHealth();
+  }
+  document.getElementById('authSecret').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitAuth();
+  });
+});
+
+// ============================================================
+// Health Check (環境バッジ更新)
+// ============================================================
+async function checkHealth() {
+  const badge = document.getElementById('envBadge');
+  try {
+    const res = await fetch(`${GAS_ENDPOINT}?action=health`, { method: 'GET' });
+    const data = await res.json();
+    if (data && data.ok && data.env) {
+      badge.className = `env-badge ${data.env}`;
+      badge.textContent = data.env === 'test' ? '— TEST ENV —' : '— PRODUCTION —';
+    } else {
+      badge.className = 'env-badge unknown';
+      badge.textContent = '— UNKNOWN —';
+    }
+  } catch (err) {
+    badge.className = 'env-badge unknown';
+    badge.textContent = '— OFFLINE —';
+  }
+}
+
+// ============================================================
+// UI helpers
+// ============================================================
+function setAmount(v) {
+  document.getElementById('amount').value = v;
+}
+function showStatus(msg, type='info') {
+  const box = document.getElementById('statusBox');
+  box.innerHTML = `<div class="status ${type}">${escapeHtml(msg)}</div>`;
+}
+function clearStatus() {
+  document.getElementById('statusBox').innerHTML = '';
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ============================================================
+// Issue
+// ============================================================
+async function issuePayment() {
+  clearStatus();
+  document.getElementById('result').classList.remove('show');
+
+  const secret = getStoredSecret();
+  if (!secret) { showAuth(); return; }
+
+  const payload = {
+    staffName: document.getElementById('staffName').value.trim(),
+    customerName: document.getElementById('customerName').value.trim(),
+    customerEmail: document.getElementById('customerEmail').value.trim(),
+    amount: parseInt(document.getElementById('amount').value, 10) || 0,
+    free1: document.getElementById('free1').value.trim(),
+    free2: document.getElementById('free2').value.trim(),
+    memo: document.getElementById('memo').value.trim(),
+    expiryHours: parseInt(document.getElementById('expiryHours').value, 10) || 168,
+  };
+
+  // クライアント側バリデーション
+  if (!payload.staffName) { showStatus('スタッフ名を入力してください', 'error'); return; }
+  if (!payload.amount || payload.amount < 1) { showStatus('金額は1円以上を入力してください', 'error'); return; }
+
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = '発行中...';
+
+  try {
+    const url = `${GAS_ENDPOINT}?action=issue&secret=${encodeURIComponent(secret)}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      // GAS WebApp は CORS preflight 回避のため text/plain で送る
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+
+    if (!data.ok) {
+      if (String(data.error).includes('authentication')) {
+        sessionStorage.removeItem(STORAGE_KEY);
+        showAuth();
+        return;
+      }
+      showStatus('発行に失敗しました: ' + (data.error || '不明なエラー'), 'error');
+      return;
+    }
+
+    // 成功
+    document.getElementById('resultUrl').textContent = data.linkUrl;
+    document.getElementById('resultExpiry').textContent = data.expiry || '';
+    document.getElementById('mailPreview').textContent = data.mailTemplate || '';
+    document.getElementById('result').classList.add('show');
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // 入力欄は残しておく（連続発行に便利）
+  } catch (err) {
+    showStatus('通信エラー: ' + err.message, 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'URL を発行する';
+  }
+}
+
+// ============================================================
+// Result actions
+// ============================================================
+async function copyUrl() {
+  const url = document.getElementById('resultUrl').textContent;
+  try {
+    await navigator.clipboard.writeText(url);
+    showStatus('URL をコピーしました', 'info');
+  } catch (e) {
+    showStatus('コピー失敗: ' + e.message, 'error');
+  }
+}
+async function copyMail() {
+  const text = document.getElementById('mailPreview').textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    showStatus('メール文面をコピーしました', 'info');
+  } catch (e) {
+    showStatus('コピー失敗: ' + e.message, 'error');
+  }
+}
+function resetForm() {
+  document.getElementById('amount').value = '';
+  document.getElementById('customerName').value = '';
+  document.getElementById('customerEmail').value = '';
+  document.getElementById('free1').value = '';
+  document.getElementById('free2').value = '';
+  document.getElementById('memo').value = '';
+  document.getElementById('result').classList.remove('show');
+  clearStatus();
+  document.getElementById('amount').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
