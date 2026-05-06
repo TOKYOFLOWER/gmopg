@@ -156,6 +156,27 @@ function getUserAgent_(e) {
 // ============================================================
 
 /**
+ * 決済URL生成のみをテスト（API呼び出しなし、Sheets書込なし）
+ * 生成されたURLをログに出力する。ブラウザで開いて GMO 決済画面が出ればOK。
+ */
+function testBuildUrl() {
+  const cred = getGmoCredentials_();
+  const orderId = generateOrderId_();
+  const url = buildLinkplusParameterUrl_({
+    shopId: cred.shopId,
+    shopPass: cred.shopPass,
+    configId: cred.configId,
+    orderId,
+    amount: 100,
+    overview: '銀座東京フラワー: テスト発行',
+  });
+  console.log('env:', cred.env);
+  console.log('orderId:', orderId);
+  console.log('linkUrl:', url);
+  return url;
+}
+
+/**
  * テスト発行。GAS エディタで関数選択 → 実行
  */
 function testIssue() {

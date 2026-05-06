@@ -1,154 +1,71 @@
 /**
  * GmoApi.gs
- * GMO-PG リンクタイプPlus API クライアント
+ * GMO-PG リンクタイプPlus パラメータ型 URL ビルダー
  *
- * 仕様: https://docs.mul-pay.jp/linkplus/overview （要ID/PW）
+ * 公式仕様:
+ *   https://docs.gmo-pg.com/mulpay/docs/connection-method/link-type-plus/parameter-type
  *
- * 主要API:
- *   GetLinkplusUrlPayment.json   - 決済URL取得
- *   RejectLinkplusUrlPayment.json - 決済URL無効化（任意）
+ * URL 形式:
+ *   {LINKPLUS_PARAMETER_BASE}{ShopID}/checkout/{base64Json}.{sha256Hash}
+ *
+ * 組み立て手順:
+ *   1. JSON ({configid, transaction:{OrderID, Amount, Overview?}}) を生成
+ *   2. JSON を UTF-8 → URL-safe Base64 エンコード（+→-, /→_）
+ *   3. SHA256(base64 + ShopPass) を 16進小文字でハッシュ化
+ *   4. URL = base + ShopID + "/checkout/" + base64 + "." + hash
  */
 
 /**
- * 決済URL取得API を呼び出す
+ * パラメータ型 決済URLを加盟店側で組み立てる（API 呼び出しなし）
  *
  * @param {Object} args
- * @returns {{ok: boolean, linkUrl?: string, error?: string, errorCode?: string, raw?: Object}}
+ * @param {string} args.shopId   GMO ShopID
+ * @param {string} args.shopPass GMO ShopPass（ハッシュ計算に使用）
+ * @param {string} args.configId ConfigID
+ * @param {string} args.orderId  店舗側で採番した OrderID
+ * @param {number} args.amount   決済金額
+ * @param {string} [args.overview] 任意。省略時は ConfigID 側のデフォルト
+ * @returns {string} 決済URL
  */
-function callGetLinkplusUrlPayment_(args) {
-  const endpoints = getGmoEndpoints_();
-  const url = endpoints.GET_LINKPLUS_URL_PAYMENT;
+function buildLinkplusParameterUrl_(args) {
+  if (!args.shopId)   throw new Error('buildLinkplusParameterUrl_: shopId is required');
+  if (!args.shopPass) throw new Error('buildLinkplusParameterUrl_: shopPass is required');
+  if (!args.configId) throw new Error('buildLinkplusParameterUrl_: configId is required');
+  if (!args.orderId)  throw new Error('buildLinkplusParameterUrl_: orderId is required');
+  if (!Number.isFinite(args.amount) || args.amount < 1) {
+    throw new Error('buildLinkplusParameterUrl_: amount must be a positive integer');
+  }
 
-  // GMO仕様に従ったリクエストペイロード
-  // ※ 仕様書（要ID/PW）を確認しながら必要に応じて調整
-  const payload = {
-    geturlparam: {
-      ShopID: args.shopId,
-      ShopPass: args.shopPass,
-      // TemplateNo は必要に応じて。ConfigIDで代替できる場合は configid を使う
-    },
+  const transaction = {
+    OrderID: args.orderId,
+    Amount: args.amount,
+  };
+  if (args.overview) transaction.Overview = args.overview;
+
+  const json = JSON.stringify({
     configid: args.configId,
-    transaction: {
-      OrderID: args.orderId,
-      Amount: args.amount,
-      // Tax は内税運用が一般的なので0でOK。別途分けたい場合は仕様書参照
-      Tax: 0,
-      // 全決済対応（ConfigID側で利用決済手段は制御）
-      // PayMethods は省略すると ConfigID で許可された全決済が選べる
-    },
-    // 決済有効期限（YYYYMMDDHHmmss 形式）
-    // GMO仕様で「validityPeriod」または同等のキーを使う。仕様書要確認。
-    validityPeriod: Utilities.formatDate(args.expiry, 'JST', 'yyyyMMddHHmmss'),
-  };
+    transaction,
+  });
 
-  // メールアドレスがあれば、GMOからの決済案内メール送付に使う（任意）
-  if (args.customerEmail) {
-    payload.transaction.MailAddress = args.customerEmail;
-  }
+  // URL-safe Base64（+→-, /→_。末尾の '=' はそのまま許容される仕様）
+  const base64 = Utilities.base64EncodeWebSafe(json, Utilities.Charset.UTF_8);
 
-  // 自由項目（Free01〜Free20 まで定義可能。GMO仕様）
-  if (args.free1) payload.transaction.Free1 = args.free1;
-  if (args.free2) payload.transaction.Free2 = args.free2;
-  if (args.memo) payload.transaction.Free3 = args.memo;
+  // SHA256(base64 + ShopPass) → 16進小文字
+  const digestBytes = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    base64 + args.shopPass,
+    Utilities.Charset.UTF_8
+  );
+  const hash = digestBytes
+    .map(function (b) { return ('0' + (b < 0 ? b + 256 : b).toString(16)).slice(-2); })
+    .join('');
 
-  console.log('[GMO API] request:', JSON.stringify(payload));
+  const base = getGmoEndpoints_().LINKPLUS_PARAMETER_BASE;
+  const url = base + encodeURIComponent(args.shopId) + '/checkout/' + base64 + '.' + hash;
 
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true,
-  };
+  console.log('[GMO Linkplus] payload JSON:', json);
+  console.log('[GMO Linkplus] base64:', base64);
+  console.log('[GMO Linkplus] URL:', url);
 
-  let response;
-  try {
-    response = UrlFetchApp.fetch(url, options);
-  } catch (err) {
-    console.error('[GMO API] network error:', err);
-    return { ok: false, error: `GMO API ネットワークエラー: ${err}` };
-  }
-
-  const code = response.getResponseCode();
-  const text = response.getContentText('UTF-8');
-
-  console.log('[GMO API] response code:', code);
-  console.log('[GMO API] response body:', text);
-
-  if (code !== 200) {
-    return {
-      ok: false,
-      error: `GMO API HTTP ${code}: ${text}`,
-      errorCode: 'HTTP_' + code,
-    };
-  }
-
-  let data;
-  try {
-    data = JSON.parse(text);
-  } catch (err) {
-    return { ok: false, error: 'GMO API レスポンスがJSONでない: ' + text };
-  }
-
-  // GMOのエラー判定: ErrCode が空でなければエラー
-  if (data.ErrCode || data.errCode) {
-    const errCode = data.ErrCode || data.errCode;
-    const errInfo = data.ErrInfo || data.errInfo || '';
-    return {
-      ok: false,
-      error: `GMO エラー: ${errCode} ${errInfo}`,
-      errorCode: errCode,
-      raw: data,
-    };
-  }
-
-  // 成功時: LinkUrl を取得
-  const linkUrl = data.LinkUrl || data.linkUrl || (data.transaction && data.transaction.LinkUrl);
-  if (!linkUrl) {
-    return {
-      ok: false,
-      error: 'GMO レスポンスに LinkUrl が含まれていません: ' + text,
-      raw: data,
-    };
-  }
-
-  return {
-    ok: true,
-    linkUrl,
-    raw: data,
-  };
-}
-
-/**
- * 決済URL無効化API（任意機能：発行済URLを取り消す）
- */
-function callRejectLinkplusUrlPayment_(orderId) {
-  const endpoints = getGmoEndpoints_();
-  const cred = getGmoCredentials_();
-
-  const payload = {
-    ShopID: cred.shopId,
-    ShopPass: cred.shopPass,
-    OrderID: orderId,
-  };
-
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true,
-  };
-
-  const response = UrlFetchApp.fetch(endpoints.REJECT_LINKPLUS_URL_PAYMENT, options);
-  const code = response.getResponseCode();
-  const text = response.getContentText('UTF-8');
-
-  if (code !== 200) {
-    return { ok: false, error: `HTTP ${code}: ${text}` };
-  }
-
-  const data = JSON.parse(text);
-  if (data.ErrCode) {
-    return { ok: false, error: `GMO: ${data.ErrCode} ${data.ErrInfo || ''}` };
-  }
-  return { ok: true };
+  return url;
 }

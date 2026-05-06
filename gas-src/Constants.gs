@@ -26,15 +26,19 @@ const PROP_KEYS = {
   CHATWORK_ROOM_ID: 'CHATWORK_ROOM_ID',
 };
 
-/** GMO API エンドポイント */
+/**
+ * GMO リンクタイプPlus パラメータ型 URL ベース
+ * URL 全体: {LINKPLUS_PARAMETER_BASE}{ShopID}/checkout/{base64}.{hash}
+ *
+ * 注: 公式ドキュメント上、test/prod の URL 差分が不明なため、両方とも本番 URL を使用。
+ *     test 用エンドポイントが判明したら test 側のみ書き換える。
+ */
 const GMO_ENDPOINTS = {
   test: {
-    GET_LINKPLUS_URL_PAYMENT: 'https://pt01.mul-pay.jp/payment/GetLinkplusUrlPayment.json',
-    REJECT_LINKPLUS_URL_PAYMENT: 'https://pt01.mul-pay.jp/payment/RejectLinkplusUrlPayment.json',
+    LINKPLUS_PARAMETER_BASE: 'https://link.mul-pay.jp/v1/plus/',
   },
   prod: {
-    GET_LINKPLUS_URL_PAYMENT: 'https://p01.mul-pay.jp/payment/GetLinkplusUrlPayment.json',
-    REJECT_LINKPLUS_URL_PAYMENT: 'https://p01.mul-pay.jp/payment/RejectLinkplusUrlPayment.json',
+    LINKPLUS_PARAMETER_BASE: 'https://link.mul-pay.jp/v1/plus/',
   },
 };
 

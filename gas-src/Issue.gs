@@ -75,43 +75,21 @@ function issuePayment_(params) {
   const issuedAt = new Date();
   const expiry = new Date(issuedAt.getTime() + params.expiryHours * 60 * 60 * 1000);
 
-  // 2. GMO API リクエスト
-  const apiResponse = callGetLinkplusUrlPayment_({
+  // 2. Overview を組み立て（free1 があれば連結。Free1〜Free3 の正式な配置場所が確定するまでの暫定対応）
+  const shopName = getSetting_('SHOP_DISPLAY_NAME') || '銀座東京フラワー';
+  const overview = params.free1 ? `${shopName}: ${params.free1}` : shopName;
+
+  // 3. パラメータ型 決済URL を加盟店側で組み立て（API 呼び出しなし、同期）
+  const linkUrl = buildLinkplusParameterUrl_({
     shopId: cred.shopId,
     shopPass: cred.shopPass,
     configId: cred.configId,
     orderId,
     amount: params.amount,
-    customerEmail: params.customerEmail,
-    free1: params.free1,
-    free2: params.free2,
-    memo: params.memo,
-    expiry,
+    overview,
   });
 
-  if (!apiResponse.ok) {
-    // エラーでも履歴は残す
-    appendOrderRow_({
-      issueId,
-      issuedAt,
-      env: cred.env,
-      staffName: params.staffName,
-      customerName: params.customerName,
-      customerEmail: params.customerEmail,
-      amount: params.amount,
-      free1: params.free1,
-      free2: params.free2,
-      memo: params.memo,
-      orderId,
-      linkUrl: '',
-      expiry,
-      status: STATUS.ERROR,
-      errorCode: apiResponse.errorCode || '',
-    });
-    return { ok: false, error: apiResponse.error, errorCode: apiResponse.errorCode };
-  }
-
-  // 3. Sheets に行追加
+  // 4. Sheets に行追加
   appendOrderRow_({
     issueId,
     issuedAt,
@@ -124,17 +102,17 @@ function issuePayment_(params) {
     free2: params.free2,
     memo: params.memo,
     orderId,
-    linkUrl: apiResponse.linkUrl,
+    linkUrl,
     expiry,
     status: STATUS.ISSUED,
   });
 
-  // 4. メール文面生成（フロントに返す）
+  // 5. メール文面生成（フロントに返す）
   const mailTemplate = generateMailTemplate_({
     customerName: params.customerName,
     amount: params.amount,
     free1: params.free1,
-    linkUrl: apiResponse.linkUrl,
+    linkUrl,
     expiry,
   });
 
@@ -142,7 +120,7 @@ function issuePayment_(params) {
     ok: true,
     issueId,
     orderId,
-    linkUrl: apiResponse.linkUrl,
+    linkUrl,
     expiry: Utilities.formatDate(expiry, 'JST', 'yyyy-MM-dd HH:mm'),
     mailTemplate,
   };
