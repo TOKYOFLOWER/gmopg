@@ -28,6 +28,13 @@ function doGet(e) {
       });
     }
 
+    if (action === 'staff') {
+      return jsonResponse_({
+        ok: true,
+        staffList: getStaffList_(),
+      });
+    }
+
     return jsonResponse_({ ok: false, error: 'unknown action for GET' }, 400);
   } catch (err) {
     return jsonResponse_({ ok: false, error: String(err) }, 500);

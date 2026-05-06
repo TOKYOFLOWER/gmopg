@@ -144,6 +144,15 @@ function getSetting_(key) {
 }
 
 /**
+ * Settings の STAFF_LIST（カンマ区切り）を配列で返す
+ */
+function getStaffList_() {
+  const raw = getSetting_('STAFF_LIST') || '';
+  if (!raw) return [];
+  return raw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+}
+
+/**
  * 監査ログに記録
  */
 function auditLog_(action, actor, ip, ua, details) {

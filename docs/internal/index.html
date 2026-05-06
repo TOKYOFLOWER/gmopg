@@ -495,8 +495,15 @@ footer.foot::before {
 
     <div class="field">
       <label>スタッフ名 <span class="req">*</span></label>
-      <input type="text" id="staffName" placeholder="発行者の氏名" required>
+      <select id="staffSelect" onchange="onStaffChange()">
+        <option value="">— 選択してください —</option>
+        <option value="__other__">その他（手入力）</option>
+      </select>
+      <input type="text" id="staffNameOther" placeholder="スタッフ名を入力"
+             style="display:none; margin-top:8px;">
     </div>
+    <!-- 互換性のため、issuePayment() で参照される staffName を hidden で保持 -->
+    <input type="hidden" id="staffName" value="">
 
     <div class="field-row">
       <div class="field">
@@ -594,6 +601,7 @@ const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwKv9W7-yurdfYNrl1
 // Auth (簡易共有シークレット方式)
 // ============================================================
 const STORAGE_KEY = 'gmopg_internal_secret_v1';
+const STAFF_STORAGE_KEY = 'gmopg_last_staff_v1';
 
 function getStoredSecret() {
   return sessionStorage.getItem(STORAGE_KEY) || '';
@@ -627,6 +635,15 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('authSecret').addEventListener('keydown', e => {
     if (e.key === 'Enter') submitAuth();
   });
+  // 「その他（手入力）」欄は select 経由でなく直接入力されても hidden / localStorage を更新
+  const otherInput = document.getElementById('staffNameOther');
+  if (otherInput) {
+    otherInput.addEventListener('input', () => {
+      const v = otherInput.value.trim();
+      document.getElementById('staffName').value = v;
+      if (v) localStorage.setItem(STAFF_STORAGE_KEY, v);
+    });
+  }
 });
 
 // ============================================================
@@ -647,6 +664,68 @@ async function checkHealth() {
   } catch (err) {
     badge.className = 'env-badge unknown';
     badge.textContent = '— OFFLINE —';
+  }
+  loadStaffList();
+}
+
+// ============================================================
+// Staff list (Settings の STAFF_LIST から動的にドロップダウン生成)
+// ============================================================
+async function loadStaffList() {
+  const select = document.getElementById('staffSelect');
+  if (!select) return;
+
+  // 再呼び出し時の option 重複を防ぐため、プレースホルダと「その他」以外を削除
+  [...select.querySelectorAll('option')].forEach(opt => {
+    if (opt.value !== '' && opt.value !== '__other__') opt.remove();
+  });
+
+  try {
+    const res = await fetch(`${GAS_ENDPOINT}?action=staff`);
+    const data = await res.json();
+    if (!data || !data.ok || !Array.isArray(data.staffList)) return;
+
+    const otherOption = select.querySelector('option[value="__other__"]');
+    data.staffList.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      select.insertBefore(opt, otherOption);
+    });
+
+    // 前回選択を復元（リストにあれば直接選択、なければ「その他」+ 手入力に展開）
+    const last = localStorage.getItem(STAFF_STORAGE_KEY);
+    if (last) {
+      if (data.staffList.includes(last)) {
+        select.value = last;
+      } else {
+        select.value = '__other__';
+        const other = document.getElementById('staffNameOther');
+        other.style.display = '';
+        other.value = last;
+      }
+      onStaffChange();
+    }
+  } catch (err) {
+    console.warn('スタッフリスト取得失敗:', err);
+  }
+}
+
+function onStaffChange() {
+  const select = document.getElementById('staffSelect');
+  const otherInput = document.getElementById('staffNameOther');
+  const hidden = document.getElementById('staffName');
+
+  if (select.value === '__other__') {
+    otherInput.style.display = '';
+    hidden.value = otherInput.value.trim();
+  } else if (select.value === '') {
+    otherInput.style.display = 'none';
+    hidden.value = '';
+  } else {
+    otherInput.style.display = 'none';
+    hidden.value = select.value;
+    localStorage.setItem(STAFF_STORAGE_KEY, select.value);
   }
 }
 
@@ -689,7 +768,7 @@ async function issuePayment() {
   };
 
   // クライアント側バリデーション
-  if (!payload.staffName) { showStatus('スタッフ名を入力してください', 'error'); return; }
+  if (!payload.staffName) { showStatus('スタッフ名を選択してください', 'error'); return; }
   if (!payload.amount || payload.amount < 1) { showStatus('金額は1円以上を入力してください', 'error'); return; }
 
   const submitBtn = document.getElementById('submitBtn');
