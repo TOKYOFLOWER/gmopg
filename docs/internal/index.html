@@ -473,6 +473,11 @@ footer.foot::before {
     <div class="actions" style="margin-top:20px;">
       <button class="primary" onclick="submitAuth()">入室</button>
     </div>
+    <div style="margin-top:16px; font-size:0.75rem; color:var(--ink-faint);">
+      <a href="#" onclick="resetAuthStorage(event)" style="color:var(--ink-faint); text-decoration:underline;">
+        保存済み認証情報をクリアして再入力
+      </a>
+    </div>
   </div>
 </div>
 
@@ -618,9 +623,19 @@ function hideAuth() {
 function submitAuth() {
   const v = document.getElementById('authSecret').value.trim();
   if (!v) return;
+  // [DEBUG] 認証保存値の診断ログ。認証バグ確認後に削除予定。
+  console.log('[auth] submitAuth saving:', JSON.stringify(v), 'len=', v.length, 'key=', STORAGE_KEY);
   setStoredSecret(v);
   hideAuth();
   checkHealth();
+}
+
+// 認証ストレージを手動クリア（汚染状態からの復旧用）
+function resetAuthStorage(ev) {
+  if (ev) ev.preventDefault();
+  sessionStorage.removeItem(STORAGE_KEY);
+  document.getElementById('authSecret').value = '';
+  document.getElementById('authSecret').focus();
 }
 
 // ============================================================
@@ -767,6 +782,8 @@ async function issuePayment() {
   document.getElementById('result').classList.remove('show');
 
   const secret = getStoredSecret();
+  // [DEBUG] 送信直前の secret 値の診断ログ。認証バグ確認後に削除予定。
+  console.log('[issue] secret to send:', JSON.stringify(secret), 'len=', secret.length, 'key=', STORAGE_KEY);
   if (!secret) { showAuth(); return; }
 
   const payload = {
