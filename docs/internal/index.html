@@ -670,17 +670,26 @@ async function checkHealth() {
 
 // ============================================================
 // Staff list (Settings の STAFF_LIST から動的にドロップダウン生成)
+// 並行/再実行ガード: fetch の await 中に再呼び出しされても option を二重追加しない
 // ============================================================
-async function loadStaffList() {
-  const select = document.getElementById('staffSelect');
-  if (!select) return;
+let _staffListLoading = false;
+let _staffListLoaded = false;
 
-  // 再呼び出し時の option 重複を防ぐため、プレースホルダと「その他」以外を削除
-  [...select.querySelectorAll('option')].forEach(opt => {
-    if (opt.value !== '' && opt.value !== '__other__') opt.remove();
-  });
+async function loadStaffList() {
+  if (_staffListLoading || _staffListLoaded) return;
+  _staffListLoading = true;
 
   try {
+    const select = document.getElementById('staffSelect');
+    if (!select) return;
+
+    // 念のため、プレースホルダと「その他」以外の option を全削除
+    Array.from(select.options).forEach(opt => {
+      if (opt.value !== '' && opt.value !== '__other__') {
+        opt.remove();
+      }
+    });
+
     const res = await fetch(`${GAS_ENDPOINT}?action=staff`);
     const data = await res.json();
     if (!data || !data.ok || !Array.isArray(data.staffList)) return;
@@ -706,8 +715,12 @@ async function loadStaffList() {
       }
       onStaffChange();
     }
+
+    _staffListLoaded = true;
   } catch (err) {
     console.warn('スタッフリスト取得失敗:', err);
+  } finally {
+    _staffListLoading = false;
   }
 }
 
